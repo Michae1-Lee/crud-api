@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"crud-api/domain"
+	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -45,4 +46,32 @@ func (repo *UserRepository) DeleteUser(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (repo *UserRepository) FindByLogin(login string) (domain.User, error) {
+	var user domain.User
+	filter := bson.M{"login": login}
+	err := repo.client.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return domain.User{}, errors.New("user not found")
+		}
+		return domain.User{}, err
+	}
+
+	return user, nil
+}
+
+func (repo *UserRepository) Find(login string, password string) (domain.User, error) {
+	var user domain.User
+	filter := bson.M{"login": login, "password": password}
+	err := repo.client.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return domain.User{}, errors.New("user not found")
+		}
+		return domain.User{}, err
+	}
+
+	return user, nil
 }

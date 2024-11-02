@@ -5,7 +5,9 @@ import (
 )
 
 type UserServiceInterface interface {
-	GetUser(id int) (domain.User, error)
 	CreateUser(user domain.User) error
+	GetUser(id int) (domain.User, error)
 	DeleteUser(id int) error
+	FindByLogin(login string) (domain.User, error)
+	Find(login string, password string) (domain.User, error)
 }

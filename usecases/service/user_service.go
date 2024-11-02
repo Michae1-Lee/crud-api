@@ -34,3 +34,18 @@ func (s *UserService) DeleteUser(id int) error {
 	}
 	return nil
 }
+
+func (s *UserService) FindByLogin(login string) (domain.User, error) {
+	user, err := s.userRepo.FindByLogin(login)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+func (s *UserService) Find(login string, password string) (domain.User, error) {
+	user, err := s.userRepo.Find(login, password)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
