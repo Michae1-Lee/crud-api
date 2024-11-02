@@ -42,7 +42,8 @@ func (h *UserHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(token); err != nil {
+	loginResponse := types.LoginResponse{AuthToken: token}
+	if err := json.NewEncoder(w).Encode(loginResponse); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
