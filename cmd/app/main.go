@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-	router := http.NewServeMux()
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		return
@@ -23,12 +22,21 @@ func main() {
 	authService := service.NewAuthService(userRepo)
 	userHandler := api.NewUserHandler(userService, authService)
 
-	router.HandleFunc("POST /register", userHandler.RegisterUser)
-	router.HandleFunc("POST /login", userHandler.LoginUser)
+	authRouter := http.NewServeMux()
+	authRouter.HandleFunc("POST /register", userHandler.RegisterUser)
+	authRouter.HandleFunc("POST /login", userHandler.LoginUser)
+
+	apiRouter := http.NewServeMux()
+	apiRouter.HandleFunc("GET /get/{id}", userHandler.GetUser)
+
+	mainRouter := http.NewServeMux()
+	mainRouter.Handle("POST /register", authRouter)
+	mainRouter.Handle("POST /login", authRouter)
+	mainRouter.Handle("GET /get/{id}", userHandler.UserIdentity(apiRouter))
 
 	server := http.Server{
 		Addr:    ":8080",
-		Handler: router,
+		Handler: mainRouter,
 	}
 	log.Println("server started")
 	server.ListenAndServe()
