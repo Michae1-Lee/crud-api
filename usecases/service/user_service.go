@@ -13,7 +13,7 @@ func NewUserService(userRepo repository.UserRepositoryInterface) *UserService {
 	return &UserService{userRepo: userRepo}
 }
 
-func (s *UserService) GetUser(id int) (domain.User, error) {
+func (s *UserService) GetUser(id string) (domain.User, error) {
 	user, err := s.userRepo.GetUser(id)
 	if err != nil {
 		return user, err
@@ -28,7 +28,7 @@ func (s *UserService) CreateUser(user domain.User) error {
 	return nil
 }
 
-func (s *UserService) DeleteUser(id int) error {
+func (s *UserService) DeleteUser(id string) error {
 	if err := s.userRepo.DeleteUser(id); err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (s *UserService) DeleteUser(id int) error {
 func (s *UserService) FindByLogin(login string) (domain.User, error) {
 	user, err := s.userRepo.FindByLogin(login)
 	if err != nil {
-		return user, err
+		return domain.User{}, err
 	}
 	return user, nil
 }

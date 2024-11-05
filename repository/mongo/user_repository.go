@@ -29,7 +29,7 @@ func (repo *UserRepository) CreateUser(user domain.User) error {
 	return err
 }
 
-func (repo *UserRepository) GetUser(id int) (domain.User, error) {
+func (repo *UserRepository) GetUser(id string) (domain.User, error) {
 	var user domain.User
 	filter := bson.M{"_id": id}
 	err := repo.client.FindOne(context.TODO(), filter).Decode(&user)
@@ -39,7 +39,7 @@ func (repo *UserRepository) GetUser(id int) (domain.User, error) {
 	return user, nil
 }
 
-func (repo *UserRepository) DeleteUser(id int) error {
+func (repo *UserRepository) DeleteUser(id string) error {
 	filter := bson.M{"_id": id}
 	_, err := repo.client.DeleteOne(context.TODO(), filter)
 	if err != nil {
@@ -58,7 +58,6 @@ func (repo *UserRepository) FindByLogin(login string) (domain.User, error) {
 		}
 		return domain.User{}, err
 	}
-
 	return user, nil
 }
 

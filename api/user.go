@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 )
 
 type UserHandler struct {
@@ -33,12 +32,12 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
+	id := r.PathValue("id")
+	fmt.Println(r.Context().Value(userIDKey))
+	user, err := h.userService.GetUser(id)
 	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
-	user, err := h.userService.GetUser(id)
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -47,7 +46,7 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	var id int
+	var id string
 	err := json.NewDecoder(r.Body).Decode(&id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

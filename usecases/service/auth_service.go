@@ -11,7 +11,7 @@ const signingKey = "dlkasjdlas5F6SFDSKL3IU2Y3Y298"
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int `json:"user_id"`
+	UserId string `json:"user_id"`
 }
 
 type AuthService struct {
@@ -36,7 +36,7 @@ func (a *AuthService) GenerateToken(login string, password string) (string, erro
 	return token.SignedString([]byte(signingKey))
 }
 
-func (a *AuthService) ParseToken(accessToken string) (int, error) {
+func (a *AuthService) ParseToken(accessToken string) (string, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -44,11 +44,11 @@ func (a *AuthService) ParseToken(accessToken string) (int, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return 0, fmt.Errorf("invalid token claims")
+		return "", fmt.Errorf("invalid token claims")
 	}
 	return claims.UserId, nil
 }
